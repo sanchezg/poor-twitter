@@ -4,6 +4,6 @@ from .serializers import TweetSerializer
 
 
 class TweetViewSet(viewsets.ModelViewSet):
-    """docstring for TweetViewSet"""
+    """Viewset for retrieving / creating Tweet model objects."""
     queryset = Tweet.objects.order_by('-date_time')
     serializer_class = TweetSerializer
