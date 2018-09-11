@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+ <meta charset="utf-8">
+ <title>Poor Twitter App</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="description" content="A simple twitter app made with vue.js and Django">
+<meta name="keywords" content="vuejs, django, restapi">
+<!-- bootstap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<!-- boostrap css -->
+</head>
+<body>
+    <div id="starting">
+        <div class="container">
+            <form v-on:submit.prevent="addTweet()">
+                <div class="form-group">
+                  <label for="tweet_username">Username</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="tweet_username"
+                    placeholder="Enter Username"
+                    v-model="newTweet.username"
+                    required="required" >
+                </div>
+                <div class="form-group">
+                  <label for="tweet_text">Tweet</label>
+                  <textarea
+                    class="form-control"
+                    id="tweet_text"
+                    placeholder="Enter Tweet"
+                    v-model="newTweet.text"
+                    required="required"
+                    rows="3"></textarea>
+                </div>
+                <div class="footer">
+                  <button type="submit" class="btn btn-primary">Save tweet</button>
+                </div>
+                </form>
+        <div class="row">
+          <h1>Last Tweets
+          </h1>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Date created</th>
+                <th scope="col">Username</th>
+                <th scope="col">Tweet</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="tweet in tweets">
+                <th scope="row">${tweet.date_time}</th>
+                <td>${tweet.username}</td>
+                <td>${tweet.text}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="loading" v-if="loading===true">Loading&#8230;</div>
+    </div>
+<!-- vue.js files -->
+ <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.5"></script>
+<script type="text/javascript">
+ new Vue({
+   el: '#starting',
+   delimiters: ['${','}'],
+   data: {
+   tweets: [],
+   loading: false,
+   currentTweet: {},
+   message: null,
+   newTweet: { 'tweet_username': null, 'tweet_text': null },
+ },
+ mounted: function() {
+ this.getTweets();
+},
+methods: {
+ getTweets: function() {
+  this.loading = true;
+  this.$http.get('/api/tweets/')
+      .then((response) => {
+        this.tweets = response.data;
+        this.loading = false;
+      })
+      .catch((err) => {
+       this.loading = false;
+       console.log(err);
+      })
+ },
+ getTweet: function(id) {
+  this.loading = true;
+  this.$http.get('/api/tweets/${id}/')
+      .then((response) => {
+        this.currentTweet = response.data;
+        this.loading = false;
+      })
+      .catch((err) => {
+        this.loading = false;
+        console.log(err);
+      })
+ },
+ addTweet: function() {
+  this.loading = true;
+  this.$http.post('/api/tweets/',this.newTweet)
+      .then((response) => {
+        this.loading = false;
+        this.getTweets();
+      })
+      .catch((err) => {
+        this.loading = false;
+        console.log(err);
+      })
+ },
+}
+});
+</script>
+</body>
+</html>
+
+
+
